@@ -2,6 +2,7 @@ package org.daniil.searchalgorithms.algorithms;
 
 import lombok.*;
 import org.daniil.searchalgorithms.algorithms.tree.CellNode;
+import org.daniil.searchalgorithms.model.Panel;
 import org.daniil.searchalgorithms.model.area.Cell;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Dijkstra extends Algorithm{
+public class Djikstra extends Algorithm{
 
     public static final Algorithms ALGORITHM_NAME = Algorithms.DJISTRA;
 
@@ -24,7 +25,7 @@ public class Dijkstra extends Algorithm{
 
 
 
-    public Dijkstra(Cell[][] area, Cell start, Cell target) {
+    public Djikstra(Cell[][] area, Cell start, Cell target) {
         super(area);
         this.start=start;
         this.target=target;
@@ -57,6 +58,7 @@ public class Dijkstra extends Algorithm{
                 this.getArea()[target.getY()][target.getX()].setPassThrough(false);
                 this.getArea()[target.getY()][target.getX()].setCurr(false);
                 updating=false;
+                Panel.FPS=100;
                 found = temp;
             }
 
@@ -70,6 +72,7 @@ public class Dijkstra extends Algorithm{
 
                     if (!containsSame(child)) {
                         path.add(child);
+                        this.getArea()[child.getY()][child.getX()].setPassThrough(true);
                     } else {
 
                         CellNode sameNode = this.getSame(child);
@@ -84,9 +87,22 @@ public class Dijkstra extends Algorithm{
             }
 
             path.remove(temp);
+            path.trimToSize();
+            if (path.size() > 50) {
+                if (Panel.FPS < 500) {
+                    Panel.FPS = 500;
+                }
+            }
+            if (path.size() > 100) {
+                if (Panel.FPS < 1000)
+                    Panel.FPS = 1000;
+            }
             doneWith.put(new HashIndex(temp.getX(),temp.getY()), temp);
 
-            if (path.isEmpty()) updating=false;
+            if (path.isEmpty()) {
+                Panel.FPS = 100;
+                updating=false;
+            }
 
         }
 

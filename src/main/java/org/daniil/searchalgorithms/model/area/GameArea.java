@@ -3,9 +3,9 @@ package org.daniil.searchalgorithms.model.area;
 import lombok.Getter;
 import lombok.Setter;
 import org.daniil.searchalgorithms.algorithms.Algorithm;
-import org.daniil.searchalgorithms.algorithms.BFS;
 import org.daniil.searchalgorithms.algorithms.tree.CellNode;
 import org.daniil.searchalgorithms.model.MainState;
+import org.daniil.searchalgorithms.model.Panel;
 
 
 import javax.swing.*;
@@ -27,12 +27,16 @@ public class GameArea implements MouseMotionListener, KeyListener {
     @Setter
     private CellValue cellValue = CellValue.GRASS;
 
-    @Setter
+    @Setter @Getter
     private Algorithm algorithm;
 
     private final MainState mainState;
 
+    @Setter
     private boolean cleared = false;
+
+    @Getter @Setter
+    private boolean needUpdate = false;
 
     public GameArea(int size, MainState mainState) {
         this.size = size;
@@ -55,62 +59,73 @@ public class GameArea implements MouseMotionListener, KeyListener {
     public void tick() {
 
         if (algorithm != null) {
-            if (algorithm.isUpdating()) algorithm.tick();
+            if (algorithm.isUpdating()) {
+                needUpdate = true;
+                algorithm.tick();
+            }
 
             if (algorithm.getFound() != null && !cleared) {
 
                 clearPathRelated();
-                cleared = true;
 
                 CellNode cellNode = algorithm.getFound().getParent();
 
                 while (cellNode != null) {
                     area[cellNode.getY()][cellNode.getX()].setPartOfThePath(true);
+                    if (cellNode.getParent() == null)
+                        area[cellNode.getY()][cellNode.getX()].setPartOfThePath(false);
                     cellNode = cellNode.getParent();
                 }
 
-
+                Panel.FPS=100;
             }
         }
 
 
     }
 
-    public boolean containsWall() {
-        for (Cell[] cells : area) {
-            for (Cell cell : cells) {
-                if (cell.getCellValue() == CellValue.WALL) return true;
-            }
-        }
-        return false;
+    public void stopAlgorithm() {
+
+        algorithm.setUpdating(false);
+        algorithm = null;
+
+        clearPathRelated();
+
+        Panel.FPS = 100;
+
     }
 
 
     public void draw(Graphics g) {
         g.setColor(Color.black);
         g.fillRect(0,0, size, size);
-
         for (Cell[] cells : area) {
             for (Cell cell : cells) {
                 cell.draw(g);
             }
         }
-
+        needUpdate = false;
     }
 
     public void clearArea() {
         for (Cell[] cells : area) {
             for (Cell cell : cells) {
+                if (cell.getCellValue() == CellValue.TARGET || cell.getCellValue() == CellValue.START) {
+                    cell.dropWalls();
+                    continue;
+                }
                 cell.setCellValue(CellValue.GRASS);
                 cell.setPassThrough(false);
                 cell.setCurr(false);
                 cell.setPartOfThePath(false);
+                cell.dropWalls();
             }
         }
         if (algorithm != null) algorithm.setUpdating(false);
         algorithm = null;
         mainState.getUi().setStarted(false);
         cleared = false;
+        needUpdate = true;
     }
 
     public void clearPathRelated() {
@@ -118,12 +133,16 @@ public class GameArea implements MouseMotionListener, KeyListener {
             for (Cell cell : cells) {
                 cell.setPassThrough(false);
                 cell.setCurr(false);
+                cell.setPartOfThePath(false);
             }
         }
+        cleared = true;
+        needUpdate = true;
     }
 
     public void changeCellValue(int x, int y, CellValue cellValue) {
         area[y][x].setCellValue(cellValue);
+        needUpdate = true;
     }
 
 
@@ -153,7 +172,6 @@ public class GameArea implements MouseMotionListener, KeyListener {
                 }
                 //System.out.println(area[e.getX()/10][e.getY()/10].getCellValue().toString() + " " + e.getX()/10 + " " + e.getY()/10);
             } catch (ArrayIndexOutOfBoundsException ignored) {
-
             }
         }
     }
@@ -179,7 +197,6 @@ public class GameArea implements MouseMotionListener, KeyListener {
     }
 
     public Cell getStart() {
-
         for (Cell[] cells : area) {
             for (Cell cell : cells) {
                 if (cell.getCellValue() == CellValue.START)
@@ -187,7 +204,6 @@ public class GameArea implements MouseMotionListener, KeyListener {
             }
         }
         return null;
-
     }
 
     public Cell getTarget() {
@@ -202,34 +218,17 @@ public class GameArea implements MouseMotionListener, KeyListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-
-        CellNode cellNode = new CellNode(57,76,null);
-
-        switch (key) {
-            case KeyEvent.VK_SPACE:
-                break;
-            case KeyEvent.VK_1:
-                area[76][57].setPassThrough(true);
-                break;
-            case KeyEvent.VK_2:
-                break;
-
-        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
     }
 }

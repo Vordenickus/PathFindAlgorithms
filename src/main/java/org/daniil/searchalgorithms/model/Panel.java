@@ -19,7 +19,8 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     @Getter @Setter
     private boolean running = true;
 
-    private static final int FPS = 1000;
+    public static int FPS = 100;
+
 
 
 
@@ -44,14 +45,18 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
 
         long start, elapsed, wait;
 
-        long targetTime = 1000 / FPS;
 
         while (running) {
+
+            long targetTime = 1000 / FPS;
 
             start = System.nanoTime();
 
             tick();
-            repaint();
+            if (mainState.getGameArea().isNeedUpdate())
+                repaint(new Rectangle(0,0,1000,1000));
+            if (mainState.getUi().isNeedUpdate())
+                repaint(new Rectangle(1000,0,200,1000));
 
             elapsed = System.nanoTime() - start;
             wait = targetTime - elapsed / 1_000_000;
@@ -59,6 +64,8 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
             if (wait < 0) {
                 wait = 5;
             }
+
+            //System.out.println(FPS);
 
             try {
                 Thread.sleep(wait);

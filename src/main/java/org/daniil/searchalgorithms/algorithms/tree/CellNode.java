@@ -55,21 +55,22 @@ public class CellNode {
         int maxPos = area.length-1;
 
         if (x>0) {
-            if (area[y][x-1].getCellValue() != CellValue.WALL)
+            if (area[y][x-1].getCellValue() != CellValue.WALL && !area[y][x].isLeftWall())
                 children.add(new CellNode(x-1,y,this));
         }
         if (x<maxPos) {
-            if (area[y][x+1].getCellValue() != CellValue.WALL)
+            if (area[y][x+1].getCellValue() != CellValue.WALL && !area[y][x].isRightWall())
                 children.add(new CellNode(x+1,y,this));
         }
         if (y>0) {
-            if (area[y-1][x].getCellValue() != CellValue.WALL)
+            if (area[y-1][x].getCellValue() != CellValue.WALL && !area[y][x].isTopWall())
                 children.add(new CellNode(x,y-1,this));
         }
         if (y<maxPos) {
-            if (area[y+1][x].getCellValue() != CellValue.WALL)
+            if (area[y+1][x].getCellValue() != CellValue.WALL && !area[y][x].isBottomWall())
                 children.add(new CellNode(x,y+1,this));
         }
+        /*
         if (x>0&&y>0) {
             if (area[y-1][x-1].getCellValue() != CellValue.WALL)
                 children.add(new CellNode(x-1,y-1,this));
@@ -78,16 +79,15 @@ public class CellNode {
             if (area[y+1][x-1].getCellValue() != CellValue.WALL)
                 children.add(new CellNode(x-1,y+1,this));
         }
-        // #TODO: ПРОЕБАНЫ КООРДИНАТЫ
         if (x<maxPos&&y>0) {
             if (area[y-1][x+1].getCellValue() != CellValue.WALL)
                 children.add(new CellNode(x+1,y-1,this));
         }
-        // #TODO: ПРОЕБАНЫ КООРДИНАТЫ
         if (x<maxPos&&y<maxPos){
             if (area[y+1][x+1].getCellValue() != CellValue.WALL)
                 children.add(new CellNode(x+1,y+1,this));
         }
+         */
 
         //children.forEach(o-> System.out.println(o.getX()+"/"+o.getY()));
 
@@ -101,21 +101,22 @@ public class CellNode {
         int maxPos = area.length-1;
 
         if (x>0) {
-            if (area[y][x-1].getCellValue() != CellValue.WALL)
+            if (area[y][x-1].getCellValue() != CellValue.WALL && !area[y][x].isLeftWall())
                 children.add(new CellNode(x-1,y, getDistance(x-1,y,area), this));
         }
         if (x<maxPos) {
-            if (area[y][x+1].getCellValue() != CellValue.WALL)
+            if (area[y][x+1].getCellValue() != CellValue.WALL && !area[y][x].isRightWall())
                 children.add(new CellNode(x+1,y, getDistance(x+1,y,area),this));
         }
         if (y>0) {
-            if (area[y-1][x].getCellValue() != CellValue.WALL)
+            if (area[y-1][x].getCellValue() != CellValue.WALL && !area[y][x].isTopWall())
                 children.add(new CellNode(x,y-1, getDistance(x,y-1,area),this));
         }
         if (y<maxPos) {
-            if (area[y+1][x].getCellValue() != CellValue.WALL)
+            if (area[y+1][x].getCellValue() != CellValue.WALL && !area[y][x].isBottomWall())
                 children.add(new CellNode(x,y+1, getDistance(x,y+1,area),this));
         }
+        /*
         if (x>0&&y>0) {
             if (area[y-1][x-1].getCellValue() != CellValue.WALL)
                 children.add(new CellNode(x-1,y-1, getDistance(x-1,y-1,area),this));
@@ -132,6 +133,7 @@ public class CellNode {
             if (area[y+1][x+1].getCellValue() != CellValue.WALL)
                 children.add(new CellNode(x+1,y+1, getDistance(x+1,y+1,area),this));
         }
+         */
 
         //children.forEach(o-> System.out.println(o.getX()+"/"+o.getY()));
 
@@ -145,37 +147,47 @@ public class CellNode {
         int maxPos = area.length-1;
 
         if (x>0) {
-            if (area[y][x-1].getCellValue() != CellValue.WALL)
-                children.add(new CellNode(x-1,y,0, computeValueAStar(area,targetX,targetY,x-1,y), this));
+            if (area[y][x-1].getCellValue() != CellValue.WALL && !area[y][x].isLeftWall())
+                children.add(new CellNode(x-1,y,getDistance(x-1,y,area),
+                        computeValueAStar(area,targetX,targetY,x-1,y), this));
         }
         if (x<maxPos) {
-            if (area[y][x+1].getCellValue() != CellValue.WALL)
-                children.add(new CellNode(x+1,y,0, computeValueAStar(area,targetX,targetY,x+1,y),this));
+            if (area[y][x+1].getCellValue() != CellValue.WALL && !area[y][x].isRightWall())
+                children.add(new CellNode(x+1,y,getDistance(x+1,y,area),
+                        computeValueAStar(area,targetX,targetY,x+1,y),this));
         }
         if (y>0) {
-            if (area[y-1][x].getCellValue() != CellValue.WALL)
-                children.add(new CellNode(x,y-1,0, computeValueAStar(area,targetX,targetY,x,y-1),this));
+            if (area[y-1][x].getCellValue() != CellValue.WALL && !area[y][x].isTopWall())
+                children.add(new CellNode(x,y-1,getDistance(x,y-1,area),
+                        computeValueAStar(area,targetX,targetY,x,y-1),this));
         }
         if (y<maxPos) {
-            if (area[y+1][x].getCellValue() != CellValue.WALL)
-                children.add(new CellNode(x,y+1,0, computeValueAStar(area,targetX,targetY,x,y+1),this));
+            if (area[y+1][x].getCellValue() != CellValue.WALL && !area[y][x].isBottomWall())
+                children.add(new CellNode(x,y+1,getDistance(x,y+1,area),
+                        computeValueAStar(area,targetX,targetY,x,y+1),this));
         }
+        /*
         if (x>0&&y>0) {
             if (area[y-1][x-1].getCellValue() != CellValue.WALL)
-                children.add(new CellNode(x-1,y-1,0, computeValueAStar(area,targetX,targetY,x-1,y-1),this));
+                children.add(new CellNode(x-1,y-1,getDistance(x-1,y-1,area),
+                        computeValueAStar(area,targetX,targetY,x-1,y-1),this));
         }
         if (x>0&&y<maxPos) {
             if (area[y+1][x-1].getCellValue() != CellValue.WALL)
-                children.add(new CellNode(x-1,y+1,0, computeValueAStar(area,targetX,targetY,x-1,y+1),this));
+                children.add(new CellNode(x-1,y+1,getDistance(x-1,y+1,area),
+                        computeValueAStar(area,targetX,targetY,x-1,y+1),this));
         }
         if (x<maxPos&&y>0) {
             if (area[y-1][x+1].getCellValue() != CellValue.WALL)
-                children.add(new CellNode(x+1,y-1,0, computeValueAStar(area,targetX,targetY,x+1,y-1),this));
+                children.add(new CellNode(x+1,y-1,getDistance(x+1,y-1,area),
+                        computeValueAStar(area,targetX,targetY,x+1,y-1),this));
         }
         if (x<maxPos&&y<maxPos){
             if (area[y+1][x+1].getCellValue() != CellValue.WALL)
-                children.add(new CellNode(x+1,y+1,0, computeValueAStar(area,targetX,targetY,x+1,y+1),this));
+                children.add(new CellNode(x+1,y+1,getDistance(x+1,y+1,area),
+                        computeValueAStar(area,targetX,targetY,x+1,y+1),this));
         }
+         */
 
         //children.forEach(o-> System.out.println(o.getX()+"/"+o.getY()));
 
@@ -184,7 +196,7 @@ public class CellNode {
 
     private int getHeiuristic(int targetX, int targetY, int x, int y) {
 
-        return (int) (Math.sqrt((targetX-x)*(targetX-x) + (targetY-y)*(targetY-y))) * 100;
+        return (int) (Math.sqrt((targetX-x)*(targetX-x) + (targetY-y)*(targetY-y))*20);
     }
 
     public void setValueAStar(int valueAStar) {
@@ -195,9 +207,6 @@ public class CellNode {
         return getDistance(x,y,area) + getHeiuristic(targetX,targetY,x,y);
     }
 
-
-
-
     private int getDistance(int x, int y, Cell[][] area) {
 
         Cell temp = area[y][x];
@@ -206,16 +215,16 @@ public class CellNode {
 
         switch (temp.getCellValue()) {
             case GRASS:
-                addDistance = 2;
+                addDistance = 10;
                 break;
             case STONE:
                 addDistance = 1;
                 break;
             case SAND:
-                addDistance = 10;
+                addDistance = 30;
                 break;
             case WATER:
-                addDistance = 20;
+                addDistance = 200;
                 break;
             default:
                 break;

@@ -1,9 +1,9 @@
 package org.daniil.searchalgorithms.algorithms;
 
 import org.daniil.searchalgorithms.algorithms.tree.CellNode;
+import org.daniil.searchalgorithms.model.Panel;
 import org.daniil.searchalgorithms.model.area.Cell;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +24,6 @@ public class BFS extends Algorithm{
         super(area);
         this.start=start;
         this.target=target;
-        //System.out.println(start.getX() + " " + start.getY() + "/" + target.getX() + " " + target.getY());
         virtualCells = getVirtualCells();
         //System.out.println(target.getX() + " "  + target.getY());
     }
@@ -72,16 +71,21 @@ public class BFS extends Algorithm{
     public void tick() {
         if (updating) {
             if (path.isEmpty()) path.add(new CellNode(start.getX(), start.getY(), null));
-            CellNode temp = path.get(index);
+            CellNode temp = path.get(0);
             this.getArea()[temp.getY()][temp.getX()].setCurr(true);
 
             this.getArea()[temp.getY()][temp.getX()].setPassThrough(true);
             virtualCells[temp.getY()][temp.getX()].setVisited(true);
 
-            if (index>0) this.getArea()[start.getY()][start.getX()].setPassThrough(false);
+            if (index==0) {
+                this.getArea()[start.getY()][start.getX()].setCurr(false);
+                this.getArea()[start.getY()][start.getX()].setPassThrough(false);
+                index++;
+            }
 
             if (temp.getX() == target.getX() && temp.getY() == target.getY()) {
                 this.getArea()[target.getY()][target.getX()].setPassThrough(false);
+                this.found = temp;
                 updating = false;
             }
 
@@ -96,8 +100,24 @@ public class BFS extends Algorithm{
                     }
                 }
             }
-            index++;
-            if (index==path.size()) updating=false;
+            path.remove(temp);
+            path.trimToSize();
+
+            if (path.size() >= 30) {
+                if (Panel.FPS < 500) {
+                    Panel.FPS = 500;
+                }
+            }
+            if (path.size()>=100) {
+                if (Panel.FPS < 1000) {
+                    Panel.FPS = 1000;
+                }
+            }
+
+            if (path.isEmpty()) {
+                Panel.FPS=100;
+                updating=false;
+            }
         }
     }
 

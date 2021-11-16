@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.daniil.searchalgorithms.algorithms.tree.CellNode;
+import org.daniil.searchalgorithms.model.Panel;
 import org.daniil.searchalgorithms.model.area.Cell;
 
 import java.util.ArrayList;
@@ -76,6 +77,7 @@ public class AStar extends Algorithm{
 
                     if (!containsSame(child)) {
                         path.add(child);
+                        this.getArea()[child.getY()][child.getX()].setPassThrough(true);
                     } else {
 
                         CellNode sameNode = this.getSame(child);
@@ -93,6 +95,12 @@ public class AStar extends Algorithm{
             doneWith.put(new HashIndex(temp.getX(),temp.getY()),temp);
 
             if (path.isEmpty()) this.setUpdating(false);
+
+            if (path.size()>40 && Panel.FPS < 500)
+                Panel.FPS = 500;
+
+            if (path.size()>100 && Panel.FPS < 1000)
+                Panel.FPS = 1000;
 
         }
 

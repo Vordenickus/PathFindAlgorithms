@@ -28,6 +28,7 @@ public class MainState implements KeyListener, MouseListener, MouseMotionListene
         }
 
         gameArea.tick();
+        ui.tick();
 
     }
 

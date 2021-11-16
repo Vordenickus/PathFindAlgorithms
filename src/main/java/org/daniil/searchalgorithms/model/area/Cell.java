@@ -1,10 +1,12 @@
 package org.daniil.searchalgorithms.model.area;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
 
+@EqualsAndHashCode
 public class Cell {
 
     @Getter @Setter
@@ -20,8 +22,15 @@ public class Cell {
     @Getter @Setter
     private boolean curr;
 
+    private static final int HORIZONTAL_CHANCE = 40, VERTICAL_CHANCE = 20;
+
+    @Getter @Setter
+    protected boolean leftWall=false, rightWall=false, topWall=false, bottomWall=false;
+
     @Setter
     private boolean partOfThePath = false;
+
+    private final static int lineThickness = 2;
 
     @Getter
     private final int x, y;
@@ -33,6 +42,13 @@ public class Cell {
         this.cellValue = cellValue;
         this.width = size;
         this.height = size;
+    }
+
+    public void initializeWalls() {
+        leftWall = passCheck(HORIZONTAL_CHANCE);
+        rightWall = passCheck(HORIZONTAL_CHANCE);
+        topWall = passCheck(VERTICAL_CHANCE);
+        bottomWall = passCheck(VERTICAL_CHANCE);
     }
 
     public void draw(Graphics g) {
@@ -67,7 +83,37 @@ public class Cell {
         if (partOfThePath) g.setColor(Color.GREEN.darker().darker());
 
         g.fillRect(getRawX(),getRawY(),width,height);
+
+        g.setColor(Color.WHITE);
+
+
+
+        if (this.isTopWall())
+            g.fillRect(getRawX(),getRawY(),width,lineThickness);
+
+        if (this.isBottomWall())
+            g.fillRect(getRawX(),getRawY()+height-lineThickness,width,lineThickness);
+
+        if (this.isLeftWall())
+            g.fillRect(getRawX(),getRawY(),lineThickness, height);
+
+        if (this.isRightWall())
+            g.fillRect(getRawX()+width-lineThickness,getRawY(),lineThickness,height);
+
     }
+
+
+    private boolean passCheck(int chance) {
+        return (int) (Math.random()*100) < chance;
+    }
+
+    public void dropWalls() {
+        leftWall=false;
+        rightWall=false;
+        topWall=false;
+        bottomWall=false;
+    }
+
 
     public int getRawX() {
         return width * x;

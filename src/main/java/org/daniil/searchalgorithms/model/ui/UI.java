@@ -2,12 +2,14 @@ package org.daniil.searchalgorithms.model.ui;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.daniil.searchalgorithms.algorithms.AStar;
-import org.daniil.searchalgorithms.algorithms.Dijkstra;
+import org.daniil.searchalgorithms.algorithms.*;
 import org.daniil.searchalgorithms.model.GameObject;
 import org.daniil.searchalgorithms.model.MainState;
+import org.daniil.searchalgorithms.model.MazeForm;
+import org.daniil.searchalgorithms.model.Panel;
 import org.daniil.searchalgorithms.model.area.Cell;
 import org.daniil.searchalgorithms.model.area.CellValue;
+import org.daniil.searchalgorithms.model.area.GameArea;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -15,19 +17,35 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class UI implements KeyListener, MouseListener, GameObject {
 
     @Getter
     private final int x, y, width, height;
 
+    @Getter @Setter
+    private boolean needUpdate = false;
+
+    @Getter
+    private boolean isMaze = false;
+
     public ArrayList<ButtonObj> objects;
 
+    public ArrayList<ButtonObj> algorithms;
+
+    public ArrayList<ButtonObj> mazeRelated;
     @Getter
     private CellValue currSelected = CellValue.GRASS;
 
+    @Getter
+    private Algorithms currAlgorithm = BFS.ALGORITHM_NAME;
+
     @Getter @Setter
     private boolean needReset = false;
+
+    private ButtonObj startButton;
+    private ButtonObj stopButton;
 
     @Setter
     private boolean started = false;
@@ -47,6 +65,7 @@ public class UI implements KeyListener, MouseListener, GameObject {
     public void init() {
 
         objects = new ArrayList<>();
+        algorithms = new ArrayList<>();
 
         ButtonObj grass = new ButtonObj(20,100,50,50,Color.GREEN, "grass", CellValue.GRASS,this);
         grass.setSelected(true);
@@ -68,11 +87,13 @@ public class UI implements KeyListener, MouseListener, GameObject {
         setOnClicks(objects);
         initClearButton();
         initAlgorithms();
+        initMazeRelated();
     }
 
     private void setOnClicks(ArrayList<ButtonObj> buttonObjs) {
         for (ButtonObj obj : buttonObjs) {
             obj.setOnClick(()->{
+                this.needUpdate = true;
                 obj.setSelected(true);
             });
         }
@@ -80,17 +101,26 @@ public class UI implements KeyListener, MouseListener, GameObject {
 
     private void initClearButton() {
 
-        ButtonObj clear = new ButtonObj(20,220, 170, 50, Color.RED,"Clear Area", null, this);
+        ButtonObj clear = new ButtonObj(20,220, 170, 50, Color.RED,"Clear Area", this);
         objects.add(clear);
 
-        clear.setOnClick(()->this.setNeedReset(true));
+        clear.setOnClick(()-> {
+            this.setNeedReset(true);
+
+            startButton.setColor(Color.RED);
+            stopButton.setColor(Color.RED);
+
+            needUpdate=true;
+        });
 
     }
 
     private void initAlgorithms() {
-        ButtonObj start = new ButtonObj(20,400,170,50,Color.RED, "Start", null, this);
+        initSelectAlgorithms();
+        ButtonObj start = new ButtonObj(20,600,170,50,Color.GREEN, "Start", this);
+        ButtonObj stop = new ButtonObj(20, 700, 170, 50, Color.RED, "Stop and clear", this);
         start.setOnClick(()->{
-            if (mainState.getGameArea().containStart()&&mainState.getGameArea().containTarget()) {
+            if (mainState.getGameArea().containStart() && mainState.getGameArea().containTarget()) {
 
                 if (!started) {
 
@@ -99,19 +129,100 @@ public class UI implements KeyListener, MouseListener, GameObject {
                     Cell startCell = mainState.getGameArea().getStart();
                     Cell targetCell = mainState.getGameArea().getTarget();
 
-                    AStar bfs = new AStar(mainState.getGameArea().getArea(), startCell, targetCell);
 
-                    mainState.getGameArea().setAlgorithm(bfs);
+                    Algorithm algorithm = AlgorithmLoader.loadAlgorithm(mainState.getGameArea().getArea(),
+                            startCell,targetCell, currAlgorithm);
 
-                    bfs.setUpdating(true);
+                    mainState.getGameArea().setAlgorithm(algorithm);
 
+                    if (algorithm != null)
+                        algorithm.setUpdating(true);
 
+                    stop.setColor(Color.GREEN);
+                    start.setColor(Color.RED);
+
+                    if (isMaze) Panel.FPS=600;
+
+                    mainState.getGameArea().setCleared(false);
                 }
-
             }
         });
 
-        objects.add(start);
+        stop.setOnClick(()->{
+            if (started) {
+                started = false;
+                mainState.getGameArea().stopAlgorithm();
+                stop.setColor(Color.RED);
+                start.setColor(Color.GREEN);
+            }
+        });
+        startButton=start;
+        stopButton=stop;
+        algorithms.add(start);
+        algorithms.add(stop);
+    }
+
+    private void initSelectAlgorithms() {
+
+        ButtonObj bfs = new ButtonObj(5,450,60,50,Color.BLUE, "BFS", BFS.ALGORITHM_NAME, this);
+        ButtonObj djikstra = new ButtonObj(75, 450, 60,50, Color.BLUE,"Djikstra", Djikstra.ALGORITHM_NAME,this);
+        ButtonObj aStart = new ButtonObj(145, 450, 60, 50, Color.BLUE, "A*", AStar.ALGORITHM_NAME, this);
+
+        algorithms.add(bfs);
+        algorithms.add(djikstra);
+        algorithms.add(aStart);
+
+        bfs.setSelected(true);
+
+        for (ButtonObj buttonObj : algorithms) {
+            buttonObj.setOnClick(()->{
+                this.currAlgorithm = buttonObj.getAlgorithm();
+                this.needUpdate=true;
+                buttonObj.setSelected(true);
+            });
+        }
+
+    }
+
+    private void initMazeRelated() {
+
+        mazeRelated = new ArrayList<>();
+
+        ButtonObj maze = new ButtonObj(20, 800, 170, 50, Color.GREEN, "Create Maze", this);
+        maze.setOnClick(()->{
+
+            if (mainState.getGameArea().containStart() && mainState.getGameArea().containTarget() &&
+                    (mainState.getGameArea().getAlgorithm() == null || !mainState.getGameArea().getAlgorithm().isUpdating())) {
+
+                mainState.getGameArea().clearPathRelated();
+                startButton.setColor(Color.GREEN);
+                stopButton.setColor(Color.RED);
+                started=false;
+                needUpdate=true;
+
+                MazeForm mazeForm = new MazeForm(mainState.getGameArea().getArea());
+
+                mazeForm.createMaze();
+
+                BFS bfs = new BFS(mainState.getGameArea().getArea(), mainState.getGameArea().getStart(), mainState.getGameArea().getTarget());
+
+                while (!bfs.pathExist()) {
+                    System.out.println("Here");
+                    mazeForm.createMaze();
+                }
+
+                isMaze = true;
+
+                Panel.FPS = 600;
+
+                mainState.getGameArea().setNeedUpdate(true);
+
+            }
+
+        });
+
+        mazeRelated.add(maze);
+
     }
 
 
@@ -123,10 +234,42 @@ public class UI implements KeyListener, MouseListener, GameObject {
         for (ButtonObj object : objects) {
             object.draw(g);
         }
+        for (ButtonObj obj : algorithms) {
+            obj.draw(g);
+        }
+        for (ButtonObj obj : mazeRelated) {
+            obj.draw(g);
+        }
+        needUpdate = false;
     }
 
     @Override
     public void tick() {
+
+        if (mainState.getGameArea().containStart()&&mainState.getGameArea().containTarget() &&
+                (mainState.getGameArea().getAlgorithm() == null || !mainState.getGameArea().getAlgorithm().isUpdating())) {
+            if (mazeRelated.get(0).getColor() != Color.GREEN) {
+                mazeRelated.get(0).setColor(Color.GREEN);
+                needUpdate=true;
+            }
+        } else {
+            if (mazeRelated.get(0).getColor() != Color.RED) {
+                mazeRelated.get(0).setColor(Color.RED);
+                needUpdate = true;
+            }
+        }
+
+        if (mainState.getGameArea().containStart()&&mainState.getGameArea().containTarget() && stopButton.getColor() != Color.GREEN) {
+            if (startButton.getColor() != Color.GREEN) {
+                startButton.setColor(Color.GREEN);
+                needUpdate = true;
+            }
+        } else {
+            if (startButton.getColor() != Color.RED) {
+                startButton.setColor(Color.RED);
+                needUpdate = true;
+            }
+        }
 
     }
 
@@ -165,10 +308,29 @@ public class UI implements KeyListener, MouseListener, GameObject {
                     currSelected = object.getCellValue();
                 }
                 object.click();
-                break;
+                this.needUpdate=true;
+                return;
             }
         }
 
+        for (ButtonObj obj : algorithms) {
+            if (mRect.intersects(obj.getRect())) {
+                if (obj.getAlgorithm() != null) {
+                    algorithms.forEach(algorithm -> algorithm.setSelected(false));
+                    currAlgorithm = obj.getAlgorithm();
+                }
+                obj.click();
+                this.needUpdate=true;
+                return;
+            }
+        }
+
+        for (ButtonObj obj : mazeRelated) {
+            if (mRect.intersects(obj.getRect())) {
+                obj.click();
+                return;
+            }
+        }
     }
 
     @Override
