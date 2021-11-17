@@ -9,7 +9,7 @@ public class AlgorithmLoader {
         switch (algorithm) {
             case BFS:
                 return new BFS(area,start,target);
-            case DJISTRA:
+            case DJIKSTRA:
                 return new Djikstra(area,start,target);
             case ASTAR:
                 return new AStar(area,start,target);
