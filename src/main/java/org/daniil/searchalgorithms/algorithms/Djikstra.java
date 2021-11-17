@@ -5,19 +5,16 @@ import org.daniil.searchalgorithms.algorithms.tree.CellNode;
 import org.daniil.searchalgorithms.model.Panel;
 import org.daniil.searchalgorithms.model.area.Cell;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class Djikstra extends Algorithm{
 
-    public static final Algorithms ALGORITHM_NAME = Algorithms.DJISTRA;
+    public static final Algorithms ALGORITHM_NAME = Algorithms.DJIKSTRA;
 
     private final Cell start;
     private final Cell target;
 
-    private final ArrayList<CellNode> path = new ArrayList<>();
+    PriorityQueue<CellNode> path = new PriorityQueue<>(Comparator.comparingInt(CellNode::getValue));
     private final HashMap<HashIndex, CellNode> doneWith = new HashMap<>();
     // Индекс по сути не нужен, просто заглушка от других алгоритмов
     private int index = 0;
@@ -40,7 +37,7 @@ public class Djikstra extends Algorithm{
 
             if (path.isEmpty()) path.add(new CellNode(start.getX(), start.getY(), 0, null));
 
-            CellNode temp = path.get(getShortest());
+            CellNode temp = path.peek();
             //System.out.println(temp.getValue());
 
             this.getArea()[temp.getY()][temp.getX()].setCurr(true);
@@ -78,16 +75,16 @@ public class Djikstra extends Algorithm{
                         CellNode sameNode = this.getSame(child);
 
                         if (child.getValue()<sameNode.getValue()) {
-                            int desiredIndex = path.indexOf(sameNode);
-                            path.remove(desiredIndex);
-                            path.add(desiredIndex, child);
+                            //int desiredIndex = path.indexOf(sameNode);
+                            path.remove(child);
+                            path.add(child);
+                            //path.add(desiredIndex, child);
                         }
                     }
                 }
             }
 
             path.remove(temp);
-            path.trimToSize();
             if (path.size() > 50) {
                 if (Panel.FPS < 500) {
                     Panel.FPS = 500;
@@ -114,22 +111,6 @@ public class Djikstra extends Algorithm{
     }
 
 
-    // Возвращает индекс нода с самым коротким вэлью
-    public int getShortest() {
-
-        int value = Integer.MAX_VALUE;
-
-        int target = 0;
-
-        for (int i = 0, limit = path.size(); i<limit; i++) {
-            if (path.get(i).getValue() < value) {
-                value = path.get(i).getValue();
-                target = i;
-            }
-        }
-
-        return target;
-    }
 
     public boolean containsSame(CellNode cell) {
         return path.stream().anyMatch(cellNode -> cellNode.getX() == cell.getX() && cellNode.getY() == cell.getY());

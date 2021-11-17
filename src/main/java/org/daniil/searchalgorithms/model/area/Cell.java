@@ -12,7 +12,8 @@ public class Cell {
     @Getter @Setter
     private CellValue cellValue;
 
-    private int rawX, rawY;
+    @Getter
+    private final int rawX, rawY;
 
     private final int width, height;
 
@@ -42,6 +43,8 @@ public class Cell {
         this.cellValue = cellValue;
         this.width = size;
         this.height = size;
+        this.rawX = this.width * this.x;
+        this.rawY = this.height * this.y;
     }
 
     public void initializeWalls() {
@@ -112,15 +115,6 @@ public class Cell {
         rightWall=false;
         topWall=false;
         bottomWall=false;
-    }
-
-
-    public int getRawX() {
-        return width * x;
-    }
-
-    public int getRawY() {
-        return height * y;
     }
 
 }

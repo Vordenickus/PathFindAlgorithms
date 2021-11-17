@@ -8,10 +8,7 @@ import org.daniil.searchalgorithms.algorithms.tree.CellNode;
 import org.daniil.searchalgorithms.model.Panel;
 import org.daniil.searchalgorithms.model.area.Cell;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class AStar extends Algorithm{
 
@@ -21,7 +18,7 @@ public class AStar extends Algorithm{
     private final Cell target;
 
 
-    private final ArrayList<CellNode> path = new ArrayList<>();
+    PriorityQueue<CellNode> path = new PriorityQueue<>(Comparator.comparingInt(CellNode::getValueAStar));
     // Сюда кладем исследованые ноды, вэлью мапы не важно, можно пихать что угодно
     private final HashMap<HashIndex, CellNode> doneWith = new HashMap<>();
 
@@ -43,10 +40,10 @@ public class AStar extends Algorithm{
 
             if (path.isEmpty()) {
                 path.add(new CellNode(start.getX(),start.getY(), 0, null));
-                path.get(0).setValueAStar(0);
+                path.peek().setValueAStar(0);
             }
 
-            CellNode temp = path.get(getMostPromising());
+            CellNode temp = path.peek();
 
             this.getArea()[temp.getY()][temp.getX()].setCurr(true);
             this.getArea()[temp.getY()][temp.getX()].setPassThrough(true);
@@ -83,9 +80,8 @@ public class AStar extends Algorithm{
                         CellNode sameNode = this.getSame(child);
 
                         if (child.getValueAStar() < sameNode.getValueAStar()) {
-                            int desiredIndex = path.indexOf(sameNode);
-                            path.remove(desiredIndex);
-                            path.add(desiredIndex,child);
+                            path.remove(child);
+                            path.add(child);
                         }
                     }
                 }
@@ -107,20 +103,6 @@ public class AStar extends Algorithm{
 
     }
 
-
-    private int getMostPromising() {
-        int pivot = Integer.MAX_VALUE;
-        int target = -1;
-
-        for (int i=0, limit=path.size(); i<limit; i++) {
-            if (path.get(i).getValueAStar() < pivot) {
-                pivot = path.get(i).getValueAStar();
-                target = i;
-            }
-        }
-
-        return target;
-    }
 
     public boolean isDoneWith(CellNode cellNode) {
         return doneWith.containsKey(new HashIndex(cellNode.getX(),cellNode.getY()));

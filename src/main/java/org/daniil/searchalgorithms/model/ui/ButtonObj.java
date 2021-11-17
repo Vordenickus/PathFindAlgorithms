@@ -19,8 +19,8 @@ public class ButtonObj extends UiObject {
     @Getter @Setter
     private Color color;
 
-    @Getter
-    private final String text;
+    @Getter @Setter
+    private String text;
 
     private final Font font;
 

@@ -1,9 +1,6 @@
 package org.daniil.searchalgorithms.algorithms.tree;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.daniil.searchalgorithms.algorithms.Algorithm;
-import org.daniil.searchalgorithms.algorithms.VirtualCell;
 import org.daniil.searchalgorithms.model.area.Cell;
 import org.daniil.searchalgorithms.model.area.CellValue;
 
@@ -89,8 +86,6 @@ public class CellNode {
         }
          */
 
-        //children.forEach(o-> System.out.println(o.getX()+"/"+o.getY()));
-
         return children;
     }
 
@@ -134,8 +129,6 @@ public class CellNode {
                 children.add(new CellNode(x+1,y+1, getDistance(x+1,y+1,area),this));
         }
          */
-
-        //children.forEach(o-> System.out.println(o.getX()+"/"+o.getY()));
 
         return children;
     }
@@ -189,8 +182,6 @@ public class CellNode {
         }
          */
 
-        //children.forEach(o-> System.out.println(o.getX()+"/"+o.getY()));
-
         return children;
     }
 
@@ -231,6 +222,4 @@ public class CellNode {
         }
         return (this.getValue() + addDistance);
     }
-
-
 }

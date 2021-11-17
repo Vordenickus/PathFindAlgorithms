@@ -10,7 +10,6 @@ public class MazeForm {
         this.area=area;
     }
 
-
     public void createMaze() {
         initiateWalls();
         correctWalls();
@@ -74,11 +73,7 @@ public class MazeForm {
                     if (bottomCell.isTopWall()) centreCell.setBottomWall(true);
 
                 }
-
             }
         }
     }
-
-
-
 }

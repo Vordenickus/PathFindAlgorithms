@@ -170,7 +170,6 @@ public class GameArea implements MouseMotionListener, KeyListener {
                     if (SwingUtilities.isRightMouseButton(e))
                         this.changeCellValue(e.getX() / 10, e.getY() / 10, CellValue.GRASS);
                 }
-                //System.out.println(area[e.getX()/10][e.getY()/10].getCellValue().toString() + " " + e.getX()/10 + " " + e.getY()/10);
             } catch (ArrayIndexOutOfBoundsException ignored) {
             }
         }

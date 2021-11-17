@@ -9,7 +9,6 @@ import org.daniil.searchalgorithms.model.MazeForm;
 import org.daniil.searchalgorithms.model.Panel;
 import org.daniil.searchalgorithms.model.area.Cell;
 import org.daniil.searchalgorithms.model.area.CellValue;
-import org.daniil.searchalgorithms.model.area.GameArea;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -17,7 +16,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class UI implements KeyListener, MouseListener, GameObject {
 
@@ -35,6 +33,7 @@ public class UI implements KeyListener, MouseListener, GameObject {
     public ArrayList<ButtonObj> algorithms;
 
     public ArrayList<ButtonObj> mazeRelated;
+
     @Getter
     private CellValue currSelected = CellValue.GRASS;
 
@@ -44,8 +43,7 @@ public class UI implements KeyListener, MouseListener, GameObject {
     @Getter @Setter
     private boolean needReset = false;
 
-    private ButtonObj startButton;
-    private ButtonObj stopButton;
+    private ButtonObj startButton, stopButton;
 
     @Setter
     private boolean started = false;
@@ -110,6 +108,7 @@ public class UI implements KeyListener, MouseListener, GameObject {
             startButton.setColor(Color.RED);
             stopButton.setColor(Color.RED);
 
+            isMaze=false;
             needUpdate=true;
         });
 
@@ -200,22 +199,49 @@ public class UI implements KeyListener, MouseListener, GameObject {
                 started=false;
                 needUpdate=true;
 
-                MazeForm mazeForm = new MazeForm(mainState.getGameArea().getArea());
+                String[] dots = {".","..","..."};
 
-                mazeForm.createMaze();
+                maze.setText("Creating"+dots[0]);
 
-                BFS bfs = new BFS(mainState.getGameArea().getArea(), mainState.getGameArea().getStart(), mainState.getGameArea().getTarget());
+                Thread thread = new Thread(()->{
+                    int index = 0;
+                    MazeForm mazeForm = new MazeForm(mainState.getGameArea().getArea());
 
-                while (!bfs.pathExist()) {
-                    System.out.println("Here");
                     mazeForm.createMaze();
-                }
 
-                isMaze = true;
+                    BFS bfs = new BFS(mainState.getGameArea().getArea(), mainState.getGameArea().getStart(),
+                            mainState.getGameArea().getTarget());
 
-                Panel.FPS = 600;
+                    while (!bfs.pathExist()) {
+                        index++;
+                        if (index == dots.length)
+                            index = 0;
+                        maze.setText("Creating"+dots[index]);
+                        needUpdate=true;
+                        mazeForm.createMaze();
+                    }
 
-                mainState.getGameArea().setNeedUpdate(true);
+                    isMaze = true;
+
+                    mainState.getGameArea().setNeedUpdate(true);
+
+                    Panel.FPS = 600;
+
+                    maze.setText("Create maze");
+                    needUpdate = true;
+
+
+                    for (int i = 0; i < 3; i++) {
+                        mainState.getGameArea().setNeedUpdate(true);
+                        try {
+                            Thread.sleep(2);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                thread.start();
 
             }
 

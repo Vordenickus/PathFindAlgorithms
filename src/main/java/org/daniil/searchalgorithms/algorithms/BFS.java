@@ -25,7 +25,6 @@ public class BFS extends Algorithm{
         this.start=start;
         this.target=target;
         virtualCells = getVirtualCells();
-        //System.out.println(target.getX() + " "  + target.getY());
     }
 
     public boolean pathExist() {
