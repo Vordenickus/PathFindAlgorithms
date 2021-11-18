@@ -43,7 +43,7 @@ public class AStar extends Algorithm{
                 path.peek().setValueAStar(0);
             }
 
-            CellNode temp = path.peek();
+            CellNode temp = path.poll();
 
             this.getArea()[temp.getY()][temp.getX()].setCurr(true);
             this.getArea()[temp.getY()][temp.getX()].setPassThrough(true);
@@ -87,7 +87,6 @@ public class AStar extends Algorithm{
                 }
             }
 
-            path.remove(temp);
             doneWith.put(new HashIndex(temp.getX(),temp.getY()),temp);
 
             if (path.isEmpty()) this.setUpdating(false);

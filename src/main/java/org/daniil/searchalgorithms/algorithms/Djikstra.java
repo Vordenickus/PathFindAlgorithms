@@ -37,7 +37,7 @@ public class Djikstra extends Algorithm{
 
             if (path.isEmpty()) path.add(new CellNode(start.getX(), start.getY(), 0, null));
 
-            CellNode temp = path.peek();
+            CellNode temp = path.poll();
             //System.out.println(temp.getValue());
 
             this.getArea()[temp.getY()][temp.getX()].setCurr(true);
@@ -83,8 +83,6 @@ public class Djikstra extends Algorithm{
                     }
                 }
             }
-
-            path.remove(temp);
             if (path.size() > 50) {
                 if (Panel.FPS < 500) {
                     Panel.FPS = 500;
