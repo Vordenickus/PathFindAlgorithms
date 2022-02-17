@@ -7,22 +7,20 @@ import org.daniil.searchalgorithms.model.area.Cell;
 
 import java.util.*;
 
-public class Djikstra extends Algorithm{
+public class Dijkstra extends Algorithm {
 
     public static final Algorithms ALGORITHM_NAME = Algorithms.DJIKSTRA;
 
     private final Cell start;
     private final Cell target;
 
-    PriorityQueue<CellNode> path = new PriorityQueue<>(Comparator.comparingInt(CellNode::getValue));
+    private final PriorityQueue<CellNode> path = new PriorityQueue<>(Comparator.comparingInt(CellNode::getValue));
     private final HashMap<HashIndex, CellNode> doneWith = new HashMap<>();
-    // Индекс по сути не нужен, просто заглушка от других алгоритмов
-    private int index = 0;
     private final VirtualCell[][] virtualCells;
 
 
 
-    public Djikstra(Cell[][] area, Cell start, Cell target) {
+    public Dijkstra(Cell[][] area, Cell start, Cell target) {
         super(area);
         this.start=start;
         this.target=target;
@@ -33,7 +31,7 @@ public class Djikstra extends Algorithm{
     @Override
     public void tick() {
 
-        if (updating) {
+        if (this.updating) {
 
             if (path.isEmpty()) path.add(new CellNode(start.getX(), start.getY(), 0, null));
 
@@ -70,16 +68,6 @@ public class Djikstra extends Algorithm{
                     if (!containsSame(child)) {
                         path.add(child);
                         this.getArea()[child.getY()][child.getX()].setPassThrough(true);
-                    } else {
-
-                        CellNode sameNode = this.getSame(child);
-
-                        if (child.getValue()<sameNode.getValue()) {
-                            //int desiredIndex = path.indexOf(sameNode);
-                            path.remove(child);
-                            path.add(child);
-                            //path.add(desiredIndex, child);
-                        }
                     }
                 }
             }
@@ -112,16 +100,6 @@ public class Djikstra extends Algorithm{
 
     public boolean containsSame(CellNode cell) {
         return path.stream().anyMatch(cellNode -> cellNode.getX() == cell.getX() && cellNode.getY() == cell.getY());
-    }
-
-    public CellNode getSame(CellNode cell) {
-        for (CellNode cellNode : path) {
-
-            if (cellNode.getX()==cell.getX() && cellNode.getY()==cell.getY())
-                return cellNode;
-
-        }
-        return null;
     }
 
     @Data @AllArgsConstructor @EqualsAndHashCode

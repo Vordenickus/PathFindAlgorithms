@@ -16,7 +16,7 @@ public class CellNode {
     private int value = Integer.MAX_VALUE;
 
     @Getter
-    private int valueAStar = Integer.MAX_VALUE;
+    private double valueAStar = Double.MAX_VALUE;
 
     @Getter
     private final CellNode parent;
@@ -36,7 +36,7 @@ public class CellNode {
         this.value=value;
     }
 
-    public CellNode(int x, int y, int value, int valueAStar, CellNode parent) {
+    public CellNode(int x, int y, int value, double valueAStar, CellNode parent) {
         this.x=x;
         this.y=y;
         this.value=value;
@@ -185,16 +185,16 @@ public class CellNode {
         return children;
     }
 
-    private int getHeiuristic(int targetX, int targetY, int x, int y) {
-
-        return (int) (Math.sqrt((targetX-x)*(targetX-x) + (targetY-y)*(targetY-y))*20);
+    private double getHeiuristic(int targetX, int targetY, int x, int y) {
+        return Math.sqrt((targetX-x)*(targetX-x) + (targetY-y)*(targetY-y))*20;
     }
 
     public void setValueAStar(int valueAStar) {
         this.valueAStar = valueAStar;
     }
 
-    public int computeValueAStar(Cell[][] area, int targetX, int targetY, int x, int y) {
+    public double computeValueAStar(Cell[][] area, int targetX, int targetY, int x, int y) {
+       // System.out.println(getDistance(x,y,area) + getHeiuristic(targetX,targetY,x,y));
         return getDistance(x,y,area) + getHeiuristic(targetX,targetY,x,y);
     }
 

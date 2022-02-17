@@ -15,7 +15,6 @@ public class BFS extends Algorithm{
     private final Cell target;
 
     private final ArrayList<CellNode> path = new ArrayList<>();
-    private int index = 0;
 
 
     private final VirtualCell[][] virtualCells;

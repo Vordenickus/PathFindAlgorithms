@@ -50,6 +50,8 @@ public class UI implements KeyListener, MouseListener, GameObject {
 
     private final MainState mainState;
 
+    private static final String[] DOTS = {".","..","..."};
+
 
     public UI(int x, int y, int width, int height, MainState mainState) {
         this.x=x;
@@ -65,14 +67,21 @@ public class UI implements KeyListener, MouseListener, GameObject {
         objects = new ArrayList<>();
         algorithms = new ArrayList<>();
 
-        ButtonObj grass = new ButtonObj(20,100,50,50,Color.GREEN, "grass", CellValue.GRASS,this);
+        ButtonObj grass = new ButtonObj(20,100,50,50,Color.GREEN, "grass",
+                        CellValue.GRASS,this);
         grass.setSelected(true);
-        ButtonObj wall = new ButtonObj(80, 100, 50, 50, Color.WHITE, "Wall", CellValue.WALL, this);
-        ButtonObj sand = new ButtonObj(140, 100, 50, 50, Color.YELLOW, "Sand", CellValue.SAND, this);
-        ButtonObj water = new ButtonObj(20, 160, 50, 50, Color.BLUE, "Water", CellValue.WATER, this);
-        ButtonObj stone = new ButtonObj(80, 160, 50, 50, Color.GRAY.darker(), "Stone", CellValue.STONE, this);
-        ButtonObj start = new ButtonObj(20, 300, 50, 50, Color.MAGENTA, "Start", CellValue.START, this);
-        ButtonObj target = new ButtonObj(80, 300, 50, 50, Color.CYAN, "Target", CellValue.TARGET, this);
+        ButtonObj wall = new ButtonObj(80, 100, 50, 50, Color.WHITE, "Wall",
+                        CellValue.WALL, this);
+        ButtonObj sand = new ButtonObj(140, 100, 50, 50, Color.YELLOW, "Sand",
+                        CellValue.SAND, this);
+        ButtonObj water = new ButtonObj(20, 160, 50, 50, Color.BLUE, "Water",
+                        CellValue.WATER, this);
+        ButtonObj stone = new ButtonObj(80, 160, 50, 50, Color.GRAY.darker(), "Stone",
+                CellValue.STONE, this);
+        ButtonObj start = new ButtonObj(20, 300, 50, 50, Color.MAGENTA, "Start",
+                        CellValue.START, this);
+        ButtonObj target = new ButtonObj(80, 300, 50, 50, Color.CYAN, "Target",
+                        CellValue.TARGET, this);
 
         objects.add(grass);
         objects.add(wall);
@@ -163,9 +172,12 @@ public class UI implements KeyListener, MouseListener, GameObject {
 
     private void initSelectAlgorithms() {
 
-        ButtonObj bfs = new ButtonObj(5,450,60,50,Color.BLUE, "BFS", BFS.ALGORITHM_NAME, this);
-        ButtonObj djikstra = new ButtonObj(75, 450, 60,50, Color.BLUE,"Djikstra", Djikstra.ALGORITHM_NAME,this);
-        ButtonObj aStart = new ButtonObj(145, 450, 60, 50, Color.BLUE, "A*", AStar.ALGORITHM_NAME, this);
+        ButtonObj bfs = new ButtonObj(5,450,60,50,Color.BLUE, "BFS",
+                BFS.ALGORITHM_NAME, this);
+        ButtonObj djikstra = new ButtonObj(75, 450, 60,50, Color.BLUE,"Dijkstra",
+                Dijkstra.ALGORITHM_NAME,this);
+        ButtonObj aStart = new ButtonObj(145, 450, 60, 50, Color.BLUE, "A*",
+                AStar.ALGORITHM_NAME, this);
 
         algorithms.add(bfs);
         algorithms.add(djikstra);
@@ -199,9 +211,7 @@ public class UI implements KeyListener, MouseListener, GameObject {
                 started=false;
                 needUpdate=true;
 
-                String[] dots = {".","..","..."};
-
-                maze.setText("Creating"+dots[0]);
+                maze.setText("Creating"+ DOTS[0]);
 
                 Thread thread = new Thread(()->{
                     int index = 0;
@@ -214,9 +224,9 @@ public class UI implements KeyListener, MouseListener, GameObject {
 
                     while (!bfs.pathExist()) {
                         index++;
-                        if (index == dots.length)
+                        if (index == DOTS.length)
                             index = 0;
-                        maze.setText("Creating"+dots[index]);
+                        maze.setText("Creating"+ DOTS[index]);
                         needUpdate=true;
                         mazeForm.createMaze();
                     }

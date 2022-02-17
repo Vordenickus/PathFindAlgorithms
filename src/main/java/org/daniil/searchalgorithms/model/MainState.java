@@ -16,7 +16,7 @@ public class MainState implements KeyListener, MouseListener, MouseMotionListene
 
     public MainState(int width, int height) {
         gameArea = new GameArea(width-200, this);
-        ui = new UI(gameArea.getSize(),0,200,height, this);
+        ui = new UI(gameArea.getSize(),0,200, height, this);
     }
 
     public void tick() {

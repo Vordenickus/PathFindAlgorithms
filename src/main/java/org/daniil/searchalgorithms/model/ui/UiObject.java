@@ -8,19 +8,21 @@ import java.awt.*;
 @RequiredArgsConstructor
 public abstract class UiObject {
 
+    private final int x,y;
+
     @Getter
-    private final int x,y,width,height;
+    private final int width, height;
 
     private final UI parent;
 
     public abstract void draw(Graphics g);
 
     public int getX() {
-        return parent.getX()+x;
+        return parent.getX() + this.x;
     }
 
     public int getY() {
-        return parent.getY()+y;
+        return parent.getY() + this.y;
     }
 
     public Rectangle getRect() {

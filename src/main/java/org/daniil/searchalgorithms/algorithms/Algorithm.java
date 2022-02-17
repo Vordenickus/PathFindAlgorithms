@@ -17,6 +17,9 @@ public abstract class Algorithm {
     @Getter
     protected CellNode found;
 
+    // Индекс по сути не нужен, просто заглушка от других алгоритмов
+    protected int index = 0;
+
 
     public Algorithm(Cell[][] area) {
         this.area = area;

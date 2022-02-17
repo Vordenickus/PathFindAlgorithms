@@ -1,9 +1,9 @@
 package org.daniil.searchalgorithms.algorithms;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import org.daniil.searchalgorithms.algorithms.tree.CellNode;
 import org.daniil.searchalgorithms.model.Panel;
 import org.daniil.searchalgorithms.model.area.Cell;
@@ -18,7 +18,7 @@ public class AStar extends Algorithm{
     private final Cell target;
 
 
-    PriorityQueue<CellNode> path = new PriorityQueue<>(Comparator.comparingInt(CellNode::getValueAStar));
+    private final  PriorityQueue<CellNode> path = new PriorityQueue<>(Comparator.comparingDouble(CellNode::getValueAStar));
     // Сюда кладем исследованые ноды, вэлью мапы не важно, можно пихать что угодно
     private final HashMap<HashIndex, CellNode> doneWith = new HashMap<>();
 
@@ -121,7 +121,7 @@ public class AStar extends Algorithm{
     }
 
     @Data
-    @AllArgsConstructor
+    @RequiredArgsConstructor
     @EqualsAndHashCode
     private static class HashIndex {
         private final int x;

@@ -2,6 +2,7 @@ package org.daniil.searchalgorithms.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.daniil.searchalgorithms.model.area.Cell;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,12 +15,14 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
     @Getter
     private final int width, height;
 
-    private Thread mainThread;
+    private final Thread mainThread;
 
     @Getter @Setter
     private boolean running = true;
 
     public static int FPS = 100;
+
+    private static final long HALF_A_SECOND = 500_000_000;
 
 
 
@@ -45,6 +48,7 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
 
         long start, elapsed, wait;
 
+        long safe = System.nanoTime();
 
         while (running) {
 
@@ -53,10 +57,22 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
             start = System.nanoTime();
 
             tick();
-            if (mainState.getGameArea().isNeedUpdate())
-                repaint(new Rectangle(0,0,1000,1000));
+
+            for (Cell[] cells : mainState.getGameArea().getArea()) {
+                for (Cell cell : cells) {
+                    if (cell.isNeedUpdate()) {
+                        repaint(cell.getRawX(), cell.getRawY(), 10, 10);
+                    }
+                }
+            }
+
+            if (start - safe >= HALF_A_SECOND) {
+                repaint(0, 0, 1000, 1000);
+                safe = System.nanoTime();
+            }
+
             if (mainState.getUi().isNeedUpdate())
-                repaint(new Rectangle(1000,0,200,1000));
+                repaint(1000,0,200,1000);
 
             elapsed = System.nanoTime() - start;
             wait = targetTime - elapsed / 1_000_000;
@@ -64,8 +80,6 @@ public class Panel extends JPanel implements Runnable, KeyListener, MouseListene
             if (wait < 0) {
                 wait = 5;
             }
-
-            //System.out.println(FPS);
 
             try {
                 Thread.sleep(wait);
